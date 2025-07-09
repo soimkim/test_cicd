@@ -1,0 +1,48 @@
+stages:
+  - install
+  - scan
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
+
+cache:
+  paths:
+    - .pip-cache/
+
+install_fosslight:
+  stage: install
+  image: python:3.11-slim
+  before_script:
+    - apt-get update && apt-get install -y git curl
+    - pip install --upgrade pip
+  script:
+    - pip install fosslight_scanner
+    - fosslight_scanner --version
+  artifacts:
+    paths:
+      - .pip-cache/
+    expire_in: 1 hour
+  only:
+    - push
+    - merge_requests
+
+run_fosslight_scan:
+  stage: scan
+  image: python:3.11-slim
+  before_script:
+    - apt-get update && apt-get install -y git curl
+    - pip install fosslight_scanner
+  script:
+    - echo "Starting FOSSLight Scanner..."
+    - fosslight_scanner -p . -o fosslight_report
+    - echo "FOSSLight scan completed"
+  artifacts:
+    paths:
+      - fosslight_report/
+    reports:
+      junit: fosslight_report/*.xlsx
+    expire_in: 1 week
+  only:
+    - push
+    - merge_requests
+  when: always 
