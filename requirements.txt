@@ -1,0 +1,7 @@
+# Project dependencies
+fosslight_scanner>=1.0.0
+
+# Additional dependencies if needed
+requests>=2.25.0
+beautifulsoup4>=4.9.0
+lxml>=4.6.0 
